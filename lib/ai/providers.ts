@@ -1,5 +1,6 @@
 import { customProvider } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { createOpenAI } from '@ai-sdk/openai';
 // import { withTracing } from "@posthog/ai";
 // import PostHogClient from "@/app/posthog";
 // import type { SubscriptionTier } from "@/types";
@@ -34,10 +35,42 @@ const openrouter = createOpenRouter({
   },
 });
 
+// 阿里百炼支持 OpenAI 兼容模式
+const qwen = createOpenAI({
+  apiKey: process.env.DASHSCOPE_API_KEY, // 确保在 .env 中配置了此 Key
+  baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  fetch: async (url, init) => {
+    if (init?.body && typeof init.body === "string") {
+      try {
+        const body = JSON.parse(init.body);
+        // 阿里官方模型在 reasoning_enabled 时，如果补全信息缺失可能报错
+        // 这里的逻辑与你之前 patch Kimi 的逻辑一致，但注意字段名对齐
+        if (Array.isArray(body.messages)) {
+          for (const msg of body.messages) {
+            if (
+              msg.role === "assistant" &&
+              Array.isArray(msg.tool_calls) &&
+              msg.tool_calls.length > 0 &&
+              !msg.reasoning_content // 阿里官方通常使用 reasoning_content
+            ) {
+              msg.reasoning_content = ".";
+            }
+          }
+          init = { ...init, body: JSON.stringify(body) };
+        }
+      } catch {
+        // 解析失败则按原样发送
+      }
+    }
+    return globalThis.fetch(url, init);
+  },
+});
+
 const baseProviders = {
   "ask-model": openrouter("google/gemini-3-flash-preview"),
   "ask-model-free": openrouter("x-ai/grok-4.1-fast"),
   "agent-model": openrouter("moonshotai/kimi-k2.5"),
+  "model-qwen3.5-plus": qwen("qwen3.5-plus"),
   "model-sonnet-4.6": openrouter("anthropic/claude-sonnet-4-6"),
   "model-grok-4.1": openrouter("x-ai/grok-4.1-fast"),
   "model-gemini-3-flash": openrouter("google/gemini-3-flash-preview"),
@@ -73,6 +106,7 @@ export const modelDisplayNames: Record<ModelName, string> &
   "ask-model": "Auto, an intelligent model router built by HackerAI",
   "ask-model-free": "Auto, an intelligent model router built by HackerAI",
   "agent-model": "Auto, an intelligent model router built by HackerAI",
+  "model-qwen3.5-plus": "Qwen 3.5 Plus",
   "model-sonnet-4.6": "Anthropic Claude Sonnet 4.6",
   "model-grok-4.1": "xAI Grok 4.1 Fast",
   "model-gemini-3-flash": "Google Gemini 3 Flash",

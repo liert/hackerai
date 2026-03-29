@@ -11,6 +11,7 @@ export interface ModelOption {
 }
 
 export const ASK_MODEL_OPTIONS: ModelOption[] = [
+  { id: "qwen3.5-plus", label: "Qwen 3.5 Plus", thinking: true },
   { id: "gemini-3-flash", label: "Gemini 3 Flash" },
   { id: "grok-4.1", label: "Grok 4.1" },
   // { id: "opus-4.6", label: "Claude Opus 4.6" },
@@ -18,6 +19,7 @@ export const ASK_MODEL_OPTIONS: ModelOption[] = [
 ];
 
 export const AGENT_MODEL_OPTIONS: ModelOption[] = [
+  { id: "qwen3.5-plus", label: "Qwen 3.5 Plus", thinking: true },
   { id: "kimi-k2.5", label: "Kimi K2.5", thinking: true },
   { id: "gemini-3-flash", label: "Gemini 3 Flash", thinking: true },
 ];

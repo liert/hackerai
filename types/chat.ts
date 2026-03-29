@@ -13,6 +13,7 @@ export function isChatMode(value: string | null): value is ChatMode {
 
 export type SelectedModel =
   | "auto"
+  | "qwen3.5-plus"
   | "sonnet-4.6"
   | "grok-4.1"
   | "gemini-3-flash"
@@ -23,6 +24,7 @@ export type SelectedModel =
 
 export const SELECTABLE_MODELS: readonly SelectedModel[] = [
   "auto",
+  "qwen3.5-plus",
   "sonnet-4.6",
   "grok-4.1",
   "gemini-3-flash",
