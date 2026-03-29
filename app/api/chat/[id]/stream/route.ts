@@ -11,7 +11,8 @@ import {
 } from "@/lib/utils/stream-cancellation";
 import { nextJsAxiomLogger } from "@/lib/axiom/server";
 
-export const maxDuration = 800;
+// export const maxDuration = 800;
+export const maxDuration = 300;
 
 export async function GET(
   req: NextRequest,
