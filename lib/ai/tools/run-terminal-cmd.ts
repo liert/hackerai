@@ -93,7 +93,7 @@ If you are generating files:
           "One sentence explanation as to why this command needs to be run and how it contributes to the goal.",
         ),
       is_background: z
-        .boolean()
+        .coerce.boolean()
         .describe(
           "Whether the command should be run in the background. Set to FALSE if you need to retrieve output files immediately after with get_terminal_files. Only use TRUE for indefinite processes where you don't need immediate file access.",
         ),
