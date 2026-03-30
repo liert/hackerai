@@ -74,9 +74,9 @@ export async function GET(req: NextRequest) {
       ? await session.refresh({ organizationId })
       : await session.refresh();
 
-    const { sealedSession, entitlements } = refreshResult as any;
+    const { sealedSession, entitlements, permissions } = refreshResult as any;
 
-    const allEntitlements = parseEntitlements(entitlements);
+    const allEntitlements = parseEntitlements(permissions || entitlements);
     const subscription = resolveSubscriptionTier(allEntitlements);
 
     // Create response with entitlements and normalized subscription tier

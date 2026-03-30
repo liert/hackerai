@@ -57,7 +57,7 @@ export const getUserIDAndPro = async (
       throw new ChatSDKError("unauthorized:auth");
     }
 
-    const entitlements = parseEntitlements(session.entitlements);
+    const entitlements = parseEntitlements(session.permissions || session.entitlements);
     const subscription = resolveSubscriptionTier(entitlements);
 
     return {

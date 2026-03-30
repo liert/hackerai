@@ -162,7 +162,7 @@ interface GlobalStateProviderProps {
 export const GlobalStateProvider: React.FC<GlobalStateProviderProps> = ({
   children,
 }) => {
-  const { user, entitlements } = useAuth();
+  const { user, permissions } = useAuth();
   const isMobile = useIsMobile();
   const prevIsMobile = useRef(isMobile);
   const [input, setInput] = useState("");
@@ -330,20 +330,20 @@ export const GlobalStateProvider: React.FC<GlobalStateProviderProps> = ({
       return;
     }
 
-    if (Array.isArray(entitlements)) {
+    if (Array.isArray(permissions)) {
       const hasUltra =
-        entitlements.includes("ultra-plan") ||
-        entitlements.includes("ultra-monthly-plan") ||
-        entitlements.includes("ultra-yearly-plan");
-      const hasTeam = entitlements.includes("team-plan");
+        permissions.includes("ultra-plan") ||
+        permissions.includes("ultra-monthly-plan") ||
+        permissions.includes("ultra-yearly-plan");
+      const hasTeam = permissions.includes("team-plan");
       const hasProPlus =
-        entitlements.includes("pro-plus-plan") ||
-        entitlements.includes("pro-plus-monthly-plan") ||
-        entitlements.includes("pro-plus-yearly-plan");
+        permissions.includes("pro-plus-plan") ||
+        permissions.includes("pro-plus-monthly-plan") ||
+        permissions.includes("pro-plus-yearly-plan");
       const hasPro =
-        entitlements.includes("pro-plan") ||
-        entitlements.includes("pro-monthly-plan") ||
-        entitlements.includes("pro-yearly-plan");
+        permissions.includes("pro-plan") ||
+        permissions.includes("pro-monthly-plan") ||
+        permissions.includes("pro-yearly-plan");
       setSubscriptionWithNormalize(
         hasUltra
           ? "ultra"
@@ -356,7 +356,7 @@ export const GlobalStateProvider: React.FC<GlobalStateProviderProps> = ({
                 : "free",
       );
     }
-  }, [user, entitlements, setSubscriptionWithNormalize]);
+  }, [user, permissions, setSubscriptionWithNormalize]);
 
   // Refresh entitlements only when explicitly requested via URL param
   useEffect(() => {
