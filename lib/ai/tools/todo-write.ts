@@ -132,7 +132,13 @@ NEVER INCLUDE THESE IN TODOS: basic enumeration steps; reading tool output; rout
 When in doubt, use this tool. Systematic task management ensures comprehensive security coverage and prevents missed vulnerabilities.`,
     inputSchema: z.object({
       merge: z
-        .boolean()
+        .preprocess((v: any) => {
+          if (typeof v === 'string') {
+            if (v.toLowerCase() === 'true') return true;
+            if (v.toLowerCase() === 'false') return false;
+          }
+          return v;
+        }, z.boolean())
         .describe(
           "Whether to merge the todos with the existing todos. If true, the todos will be merged into the existing todos based on the id field. You can leave unchanged properties undefined. If false, the new todos will replace the existing todos.",
         ),
@@ -207,11 +213,10 @@ When in doubt, use this tool. Systematic task management ensures comprehensive s
         }));
 
         return {
-          result: `Successfully ${action} to-dos. Make sure to follow and update your to-do list as you make progress. Cancel and add new to-do tasks as needed when the user makes a correction or follow-up request.${
-            stats.inProgress === 0
+          result: `Successfully ${action} to-dos. Make sure to follow and update your to-do list as you make progress. Cancel and add new to-do tasks as needed when the user makes a correction or follow-up request.${stats.inProgress === 0
               ? " No to-dos are marked in-progress, make sure to mark them before starting the next."
               : ""
-          }`,
+            }`,
           counts,
           currentTodos,
         };

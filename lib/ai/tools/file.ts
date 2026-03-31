@@ -9,7 +9,13 @@ const editSchema = z.object({
     .string()
     .describe("The replacement text that will substitute the found text"),
   all: z
-    .boolean()
+    .preprocess((v: any) => {
+      if (typeof v === 'string') {
+        if (v.toLowerCase() === 'true') return true;
+        if (v.toLowerCase() === 'false') return false;
+      }
+      return v;
+    }, z.boolean())
     .optional()
     .describe(
       "Whether to replace all occurrences instead of just the first one. Defaults to false.",

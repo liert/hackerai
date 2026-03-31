@@ -93,7 +93,7 @@ If you are generating files:
           "One sentence explanation as to why this command needs to be run and how it contributes to the goal.",
         ),
       is_background: z
-        .preprocess((v) => {
+        .preprocess((v: any) => {
           if (typeof v === 'string') {
             if (v.toLowerCase() === 'true') return true;
             if (v.toLowerCase() === 'false') return false;
@@ -104,7 +104,13 @@ If you are generating files:
           "Whether the command should be run in the background. Set to FALSE if you need to retrieve output files immediately after with get_terminal_files. Only use TRUE for indefinite processes where you don't need immediate file access.",
         ),
       timeout: z
-        .number()
+        .preprocess((v: any) => {
+          if (typeof v === "string" && v.trim() !== "") {
+            const parsed = Number(v);
+            return isNaN(parsed) ? v : parsed;
+          }
+          return v;
+        }, z.number())
         .optional()
         .default(DEFAULT_STREAM_TIMEOUT_SECONDS)
         .describe(
@@ -381,9 +387,9 @@ If you are generating files:
               is_background
                 ? undefined
                 : {
-                    onStdout: handler!.stdout,
-                    onStderr: handler!.stderr,
-                  },
+                  onStdout: handler!.stdout,
+                  onStderr: handler!.stderr,
+                },
             );
 
             // Determine if an error is a permanent command failure (don't retry)
@@ -422,7 +428,7 @@ If you are generating files:
               exitCode: number;
               pid?: number;
             }> = is_background
-              ? retryWithBackoff(
+                ? retryWithBackoff(
                   async () => {
                     const result = await sandboxInstance.commands.run(command, {
                       ...commonOptions,
@@ -442,10 +448,10 @@ If you are generating files:
                     jitterMs: 50,
                     isPermanentError,
                     // Retry logs are too noisy - they're expected behavior
-                    logger: () => {},
+                    logger: () => { },
                   },
                 )
-              : retryWithBackoff(
+                : retryWithBackoff(
                   () => sandboxInstance.commands.run(command, commonOptions),
                   {
                     maxRetries: 6,
@@ -453,7 +459,7 @@ If you are generating files:
                     jitterMs: 50,
                     isPermanentError,
                     // Retry logs are too noisy - they're expected behavior
-                    logger: () => {},
+                    logger: () => { },
                   },
                 );
 
@@ -507,13 +513,13 @@ If you are generating files:
                   resolve({
                     result: is_background
                       ? {
-                          pid: processId,
-                          output: `Background process started with PID: ${processId ?? "unknown"}\n`,
-                        }
+                        pid: processId,
+                        output: `Background process started with PID: ${processId ?? "unknown"}\n`,
+                      }
                       : {
-                          exitCode: exec.exitCode ?? 0,
-                          output: outputWithSaveInfo,
-                        },
+                        exitCode: exec.exitCode ?? 0,
+                        output: outputWithSaveInfo,
+                      },
                   });
                 }
               })
